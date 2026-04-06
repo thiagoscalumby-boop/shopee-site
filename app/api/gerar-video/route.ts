@@ -11,19 +11,17 @@ export async function POST(req: Request) {
       );
     }
 
-    const resultado = {
+    return NextResponse.json({
       status: "ok",
       mensagem: "Vídeo preparado com sucesso",
       videoUrl: "/video-exemplo.mp4",
       dados: {
         titulo,
         preco,
-        imagem: imagem || ""
-      }
-    };
-
-    return NextResponse.json(resultado);
-  } catch (error) {
+        imagem: imagem || "",
+      },
+    });
+  } catch {
     return NextResponse.json(
       { error: "Erro ao gerar vídeo" },
       { status: 500 }
