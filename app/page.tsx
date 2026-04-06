@@ -30,8 +30,8 @@ export default function Home() {
   const plataforma = useMemo(() => detectarPlataforma(link), [link]);
 
 async function gerarVideoAutomatico() {
-  window.open("/video-exemplo.mp4", "_blank");
-} {
+  window.location.href = "/video-exemplo.mp4";
+}
     if (!link) {
       alert("Cole o link primeiro");
       return;
