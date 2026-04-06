@@ -30,11 +30,10 @@ export default function Home() {
   const plataforma = useMemo(() => detectarPlataforma(link), [link]);
 
   // 🔥 CAPTURAR PRODUTO
-  async function capturarProduto() {
-    if (!link) {
-      alert("Cole o link primeiro");
-      return;
-    }
+ async function gerarVideoAutomatico() {
+  const url = `/preview-video?titulo=${encodeURIComponent(titulo)}&preco=${encodeURIComponent(preco)}&imagem=${encodeURIComponent(imagem)}&link=${encodeURIComponent(link)}`;
+  window.open(url, "_blank");
+}
 
     try {
       const res = await fetch("/api/capturar-produto", {
