@@ -4,9 +4,12 @@ import { useState } from "react";
 
 export default function Home() {
   const [link, setLink] = useState("");
+  const [resultado, setResultado] = useState("");
 
   const gerarVideo = () => {
-    alert("Em breve o sistema vai gerar vídeo automático para: " + link);
+    const texto = `🔥 Oferta incrível!\n\nCompre agora: ${link}\n\nAproveite antes que acabe!`;
+
+    setResultado(texto);
   };
 
   return (
@@ -17,7 +20,8 @@ export default function Home() {
       justifyContent: "center",
       height: "100vh",
       background: "#111",
-      color: "#fff"
+      color: "#fff",
+      padding: "20px"
     }}>
       <h1>🔥 TSC Shopee Vídeos</h1>
 
@@ -44,8 +48,22 @@ export default function Home() {
           border: "none"
         }}
       >
-        Gerar Vídeo
+        Gerar Conteúdo
       </button>
+
+      {resultado && (
+        <textarea
+          value={resultado}
+          readOnly
+          style={{
+            marginTop: "20px",
+            width: "300px",
+            height: "120px",
+            borderRadius: "8px",
+            padding: "10px"
+          }}
+        />
+      )}
     </div>
   );
 }
