@@ -101,7 +101,14 @@ ${link}`;
 
           <div style={{ padding: "16px" }}>
             <h1 style={{ fontSize: "22px", marginBottom: "10px" }}>{titulo}</h1>
-            <p style={{ fontSize: "28px", fontWeight: "bold", color: "#22c55e", marginBottom: "12px" }}>
+            <p
+              style={{
+                fontSize: "28px",
+                fontWeight: "bold",
+                color: "#22c55e",
+                marginBottom: "12px"
+              }}
+            >
               {preco}
             </p>
             <p style={{ color: "#ddd", fontSize: "14px", marginBottom: "14px" }}>
