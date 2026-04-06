@@ -149,7 +149,7 @@ ${roteiro}`;
           }}
         >
           <h1 style={{ textAlign: "center", marginBottom: "8px" }}>
-            🔥 TSC Shopee Vídeos
+            🔥 TSC Achadinhos Vídeos e imagens
           </h1>
 
           <p style={{ textAlign: "center", color: "#bbb", marginBottom: "24px" }}>
