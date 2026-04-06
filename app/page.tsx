@@ -63,6 +63,36 @@ async function capturarProduto() {
   } catch (error) {
     alert("Não foi possível capturar automaticamente");
   }
+}async function gerarVideoAutomatico() {
+  if (!titulo || !preco) {
+    alert("Preencha ou capture o produto primeiro");
+    return;
+  }
+
+  try {
+    const res = await fetch("/api/gerar-video", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        titulo,
+        preco,
+        imagem
+      })
+    });
+
+    const data = await res.json();
+
+    if (data.error) {
+      alert(data.error);
+      return;
+    }
+
+    alert("Vídeo preparado com sucesso: " + data.videoUrl);
+  } catch (error) {
+    alert("Erro ao conectar com a API de vídeo");
+  }
 }
   function gerarConteudo() {
     const plataforma = detectarPlataforma(link);
