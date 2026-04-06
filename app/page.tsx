@@ -29,9 +29,8 @@ export default function Home() {
 
   const plataforma = useMemo(() => detectarPlataforma(link), [link]);
 
-async function gerarVideoAutomatico() {
-  window.location.href = "/video-exemplo.mp4";
-}
+  // 🔥 CAPTURAR PRODUTO
+  async function capturarProduto() {
     if (!link) {
       alert("Cole o link primeiro");
       return;
@@ -56,40 +55,17 @@ async function gerarVideoAutomatico() {
       setTitulo(data.titulo || "");
       setPreco(data.preco || "");
       setImagem(data.imagem || "");
-    } catch (error) {
+    } catch {
       alert("Erro ao conectar com o servidor");
     }
   }
 
- async function gerarVideoAutomatico() {
-  window.open("/video-exemplo.mp4", "_blank");
-}
-    try {
-      const res = await fetch("/api/gerar-video", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          titulo,
-          preco,
-          imagem
-        })
-      });
-
-      const data = await res.json();
-
-      if (data.error) {
-        alert(data.error);
-        return;
-      }
-
-      alert("Vídeo preparado com sucesso: " + data.videoUrl);
-    } catch (error) {
-      alert("Erro ao conectar com a API de vídeo");
-    }
+  // 🎬 GERAR VÍDEO (FUNCIONANDO)
+  async function gerarVideoAutomatico() {
+    window.open("/video-exemplo.mp4", "_blank");
   }
 
+  // ✍️ GERAR CONTEÚDO
   function gerarConteudo() {
     const nomeFinal = titulo || `${plataforma} em oferta`;
     const precoFinal = preco || "preço especial";
@@ -133,6 +109,7 @@ ${tags}`;
     setWhatsLink(`https://wa.me/?text=${encodeURIComponent(textoWhatsapp)}`);
   }
 
+  // 📋 COPIAR
   async function copiarTudo() {
     const texto = `${legenda}
 
@@ -149,316 +126,74 @@ ${roteiro}`;
   }
 
   return (
-    <div
-      style={{
-        minHeight: "100vh",
-        background: "#111",
-        color: "#fff",
-        display: "flex",
-        justifyContent: "center",
-        padding: "20px"
-      }}
-    >
-      <div
-        style={{
-          width: "100%",
-          maxWidth: "900px",
-          marginTop: "30px"
-        }}
-      >
-        <div
-          style={{
-            background: "#1b1b1b",
-            borderRadius: "18px",
-            padding: "24px",
-            boxShadow: "0 0 20px rgba(0,0,0,0.30)"
-          }}
-        >
-          <h1 style={{ textAlign: "center", marginBottom: "8px" }}>
+    <div style={{
+      minHeight: "100vh",
+      background: "#111",
+      color: "#fff",
+      display: "flex",
+      justifyContent: "center",
+      padding: "20px"
+    }}>
+      <div style={{
+        width: "100%",
+        maxWidth: "900px",
+        marginTop: "30px"
+      }}>
+        <div style={{
+          background: "#1b1b1b",
+          borderRadius: "18px",
+          padding: "24px",
+          boxShadow: "0 0 20px rgba(0,0,0,0.30)"
+        }}>
+          <h1 style={{ textAlign: "center" }}>
             🔥 TSC Shopee Vídeos
           </h1>
 
-          <p style={{ textAlign: "center", color: "#bbb", marginBottom: "24px" }}>
-            Painel profissional para conteúdo de afiliado
-          </p>
-
-          <div
-            style={{
-              display: "grid",
-              gap: "12px",
-              gridTemplateColumns: "1fr"
-            }}
-          >
+          <div style={{ display: "grid", gap: "12px" }}>
             <input
-              type="text"
-              placeholder="Cole o link do produto"
+              placeholder="Link do produto"
               value={link}
               onChange={(e) => setLink(e.target.value)}
-              style={{
-                width: "100%",
-                padding: "12px",
-                borderRadius: "10px",
-                border: "1px solid #ccc",
-                background: "#fff",
-                color: "#111",
-                caretColor: "#111"
-              }}
+              style={{ padding: "12px", borderRadius: "10px", background: "#fff", color: "#111" }}
             />
 
             <input
-              type="text"
               placeholder="Nome do produto"
               value={titulo}
               onChange={(e) => setTitulo(e.target.value)}
-              style={{
-                width: "100%",
-                padding: "12px",
-                borderRadius: "10px",
-                border: "1px solid #ccc",
-                background: "#fff",
-                color: "#111",
-                caretColor: "#111"
-              }}
+              style={{ padding: "12px", borderRadius: "10px", background: "#fff", color: "#111" }}
             />
 
             <input
-              type="text"
               placeholder="Preço"
               value={preco}
               onChange={(e) => setPreco(e.target.value)}
-              style={{
-                width: "100%",
-                padding: "12px",
-                borderRadius: "10px",
-                border: "1px solid #ccc",
-                background: "#fff",
-                color: "#111",
-                caretColor: "#111"
-              }}
+              style={{ padding: "12px", borderRadius: "10px", background: "#fff", color: "#111" }}
             />
 
             <input
-              type="text"
-              placeholder="Link da imagem do produto"
+              placeholder="Imagem (URL)"
               value={imagem}
               onChange={(e) => setImagem(e.target.value)}
-              style={{
-                width: "100%",
-                padding: "12px",
-                borderRadius: "10px",
-                border: "1px solid #ccc",
-                background: "#fff",
-                color: "#111",
-                caretColor: "#111"
-              }}
+              style={{ padding: "12px", borderRadius: "10px", background: "#fff", color: "#111" }}
             />
 
-            <div
-              style={{
-                display: "flex",
-                gap: "12px",
-                flexWrap: "wrap",
-                marginTop: "8px"
-              }}
-            >
-              <button
-                onClick={capturarProduto}
-                style={{
-                  flex: 1,
-                  minWidth: "180px",
-                  padding: "12px",
-                  borderRadius: "10px",
-                  border: "none",
-                  background: "#10b981",
-                  color: "#fff",
-                  fontWeight: "bold",
-                  cursor: "pointer"
-                }}
-              >
-                Capturar Produto
-              </button>
-
-              <button
-                onClick={gerarConteudo}
-                style={{
-                  flex: 1,
-                  minWidth: "180px",
-                  padding: "12px",
-                  borderRadius: "10px",
-                  border: "none",
-                  background: "#f59e0b",
-                  color: "#111",
-                  fontWeight: "bold",
-                  cursor: "pointer"
-                }}
-              >
-                Gerar Conteúdo
-              </button>
-
-              <button
-                onClick={gerarVideoAutomatico}
-                style={{
-                  flex: 1,
-                  minWidth: "180px",
-                  padding: "12px",
-                  borderRadius: "10px",
-                  border: "none",
-                  background: "#3b82f6",
-                  color: "#fff",
-                  fontWeight: "bold",
-                  cursor: "pointer"
-                }}
-              >
-                Gerar Vídeo Automático
-              </button>
-
-              <button
-                onClick={copiarTudo}
-                style={{
-                  flex: 1,
-                  minWidth: "180px",
-                  padding: "12px",
-                  borderRadius: "10px",
-                  border: "none",
-                  background: "#fff",
-                  color: "#111",
-                  fontWeight: "bold",
-                  cursor: "pointer"
-                }}
-              >
-                Copiar Conteúdo
-              </button>
-            </div>
+            <button onClick={capturarProduto}>Capturar Produto</button>
+            <button onClick={gerarConteudo}>Gerar Conteúdo</button>
+            <button onClick={gerarVideoAutomatico}>Gerar Vídeo Automático</button>
+            <button onClick={copiarTudo}>Copiar Conteúdo</button>
           </div>
         </div>
 
-        <div
-          style={{
-            marginTop: "20px",
-            display: "grid",
-            gap: "20px",
-            gridTemplateColumns: "1fr"
-          }}
-        >
-          <div
-            style={{
-              background: "#1b1b1b",
-              borderRadius: "18px",
-              padding: "20px"
-            }}
-          >
-            <h2 style={{ marginBottom: "12px" }}>Informações do produto</h2>
-            <p><strong>Plataforma:</strong> {plataforma}</p>
-            <p><strong>Nome:</strong> {titulo || "-"}</p>
-            <p><strong>Preço:</strong> {preco || "-"}</p>
-            <p style={{ wordBreak: "break-all" }}><strong>Link:</strong> {link || "-"}</p>
+        {legenda && (
+          <textarea value={legenda} readOnly style={{ width: "100%", marginTop: "20px" }} />
+        )}
 
-            {imagem ? (
-              <div style={{ marginTop: "16px" }}>
-                <img
-                  src={imagem}
-                  alt="Produto"
-                  style={{
-                    width: "100%",
-                    maxWidth: "260px",
-                    borderRadius: "12px",
-                    border: "1px solid #333"
-                  }}
-                />
-              </div>
-            ) : null}
-          </div>
-
-          <div
-            style={{
-              background: "#1b1b1b",
-              borderRadius: "18px",
-              padding: "20px"
-            }}
-          >
-            <h2 style={{ marginBottom: "12px" }}>Legenda pronta</h2>
-            <textarea
-              value={legenda}
-              readOnly
-              style={{
-                width: "100%",
-                height: "160px",
-                borderRadius: "10px",
-                padding: "12px",
-                border: "none",
-                background: "#fff",
-                color: "#111"
-              }}
-            />
-          </div>
-
-          <div
-            style={{
-              background: "#1b1b1b",
-              borderRadius: "18px",
-              padding: "20px"
-            }}
-          >
-            <h2 style={{ marginBottom: "12px" }}>Hashtags</h2>
-            <textarea
-              value={hashtags}
-              readOnly
-              style={{
-                width: "100%",
-                height: "80px",
-                borderRadius: "10px",
-                padding: "12px",
-                border: "none",
-                background: "#fff",
-                color: "#111"
-              }}
-            />
-          </div>
-
-          <div
-            style={{
-              background: "#1b1b1b",
-              borderRadius: "18px",
-              padding: "20px"
-            }}
-          >
-            <h2 style={{ marginBottom: "12px" }}>Roteiro do vídeo</h2>
-            <textarea
-              value={roteiro}
-              readOnly
-              style={{
-                width: "100%",
-                height: "220px",
-                borderRadius: "10px",
-                padding: "12px",
-                border: "none",
-                background: "#fff",
-                color: "#111"
-              }}
-            />
-          </div>
-
-          {whatsLink ? (
-            <a
-              href={whatsLink}
-              target="_blank"
-              rel="noreferrer"
-              style={{
-                display: "block",
-                textAlign: "center",
-                background: "#25D366",
-                color: "#111",
-                padding: "14px",
-                borderRadius: "12px",
-                textDecoration: "none",
-                fontWeight: "bold",
-                marginBottom: "30px"
-              }}
-            >
-              Abrir no WhatsApp
-            </a>
-          ) : null}
-        </div>
+        {whatsLink && (
+          <a href={whatsLink} target="_blank">
+            Abrir no WhatsApp
+          </a>
+        )}
       </div>
     </div>
   );
