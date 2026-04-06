@@ -1,14 +1,17 @@
-'use client'
+type PreviewPageProps = {
+  searchParams?: {
+    titulo?: string;
+    preco?: string;
+    imagem?: string;
+    link?: string;
+  };
+};
 
-import { useSearchParams } from "next/navigation";
-
-export default function PreviewVideoPage() {
-  const searchParams = useSearchParams();
-
-  const titulo = searchParams.get("titulo") || "Produto em oferta";
-  const preco = searchParams.get("preco") || "Preço especial";
-  const imagem = searchParams.get("imagem") || "";
-  const link = searchParams.get("link") || "";
+export default function PreviewVideoPage({ searchParams }: PreviewPageProps) {
+  const titulo = searchParams?.titulo || "Produto em oferta";
+  const preco = searchParams?.preco || "Preço especial";
+  const imagem = searchParams?.imagem || "";
+  const link = searchParams?.link || "";
 
   const textoWhatsapp = `🔥 ${titulo}
 
@@ -28,7 +31,7 @@ ${link}`;
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
-        padding: "20px"
+        padding: "20px",
       }}
     >
       <div
@@ -38,7 +41,7 @@ ${link}`;
           background: "#1b1b1b",
           borderRadius: "18px",
           padding: "20px",
-          boxShadow: "0 0 20px rgba(0,0,0,0.30)"
+          boxShadow: "0 0 20px rgba(0,0,0,0.30)",
         }}
       >
         <div
@@ -49,7 +52,7 @@ ${link}`;
             overflow: "hidden",
             display: "flex",
             flexDirection: "column",
-            justifyContent: "space-between"
+            justifyContent: "space-between",
           }}
         >
           <div style={{ padding: "14px" }}>
@@ -61,7 +64,7 @@ ${link}`;
                 padding: "6px 10px",
                 borderRadius: "999px",
                 fontWeight: "bold",
-                fontSize: "12px"
+                fontSize: "12px",
               }}
             >
               OFERTA
@@ -78,7 +81,7 @@ ${link}`;
                   maxHeight: "250px",
                   objectFit: "cover",
                   borderRadius: "14px",
-                  border: "1px solid #333"
+                  border: "1px solid #333",
                 }}
               />
             ) : (
@@ -91,7 +94,7 @@ ${link}`;
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
-                  color: "#bbb"
+                  color: "#bbb",
                 }}
               >
                 Sem imagem
@@ -106,7 +109,7 @@ ${link}`;
                 fontSize: "28px",
                 fontWeight: "bold",
                 color: "#22c55e",
-                marginBottom: "12px"
+                marginBottom: "12px",
               }}
             >
               {preco}
@@ -121,7 +124,7 @@ ${link}`;
                 textAlign: "center",
                 padding: "12px",
                 borderRadius: "12px",
-                fontWeight: "bold"
+                fontWeight: "bold",
               }}
             >
               Clique no link e confira agora
@@ -142,7 +145,7 @@ ${link}`;
               padding: "12px",
               borderRadius: "12px",
               textDecoration: "none",
-              fontWeight: "bold"
+              fontWeight: "bold",
             }}
           >
             Baixar vídeo base
@@ -160,7 +163,7 @@ ${link}`;
               padding: "12px",
               borderRadius: "12px",
               textDecoration: "none",
-              fontWeight: "bold"
+              fontWeight: "bold",
             }}
           >
             Enviar no WhatsApp
