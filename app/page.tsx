@@ -19,7 +19,22 @@ export default function Home() {
   const [preco, setPreco] = useState("");
   const [resultado, setResultado] = useState("");
   const [whatsLink, setWhatsLink] = useState("");
+async function capturarProduto() {
+  if (!link) {
+    alert("Cole o link primeiro");
+    return;
+  }
 
+  try {
+    // Simulação (próxima etapa vamos fazer real)
+    setTitulo("Produto incrível da Shopee");
+    setPreco("R$ 49,90");
+
+    alert("Produto capturado (simulação)");
+  } catch (error) {
+    alert("Não foi possível capturar automaticamente");
+  }
+}
   function gerarConteudo() {
     const plataforma = detectarPlataforma(link);
     const nomeFinal = titulo || `${plataforma} em oferta`;
@@ -117,7 +132,22 @@ ${link}
             caretColor: "#111"
           }}
         />
-
+<button
+  onClick={capturarProduto}
+  style={{
+    width: "100%",
+    padding: "12px",
+    borderRadius: "10px",
+    border: "none",
+    background: "#10b981",
+    color: "#fff",
+    fontWeight: "bold",
+    cursor: "pointer",
+    marginBottom: "10px"
+  }}
+>
+  Capturar Produto
+</button>
         <button
           onClick={gerarConteudo}
           style={{
