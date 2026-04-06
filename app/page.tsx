@@ -29,7 +29,9 @@ export default function Home() {
 
   const plataforma = useMemo(() => detectarPlataforma(link), [link]);
 
-  async function capturarProduto() {
+async function gerarVideoAutomatico() {
+  window.open("/video-exemplo.mp4", "_blank");
+} {
     if (!link) {
       alert("Cole o link primeiro");
       return;
