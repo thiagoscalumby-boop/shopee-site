@@ -26,6 +26,35 @@ async function capturarProduto() {
   }
 
   try {
+    const res = await fetch("/api/capturar-produto", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ link })
+    });
+
+    const data = await res.json();
+
+    if (data.error) {
+      alert("Erro ao capturar produto");
+      return;
+    }
+
+    setTitulo(data.titulo);
+    setPreco(data.preco);
+    setImagem(data.imagem);
+
+  } catch (error) {
+    alert("Erro ao conectar com o servidor");
+  }
+}
+  if (!link) {
+    alert("Cole o link primeiro");
+    return;
+  }
+
+  try {
     // Simulação (próxima etapa vamos fazer real)
     setTitulo("Produto incrível da Shopee");
     setPreco("R$ 49,90");
