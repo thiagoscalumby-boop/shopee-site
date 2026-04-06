@@ -222,6 +222,22 @@ ${link}
         >
           Gerar Conteúdo
         </button>
+        <button
+  onClick={gerarVideoAutomatico}
+  style={{
+    flex: 1,
+    minWidth: "180px",
+    padding: "12px",
+    borderRadius: "10px",
+    border: "none",
+    background: "#3b82f6",
+    color: "#fff",
+    fontWeight: "bold",
+    cursor: "pointer"
+  }}
+>
+  Gerar Vídeo Automático
+</button>
 
         {resultado && (
           <>
