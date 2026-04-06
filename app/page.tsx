@@ -61,12 +61,9 @@ async function gerarVideoAutomatico() {
     }
   }
 
-  async function gerarVideoAutomatico() {
-    if (!titulo || !preco) {
-      alert("Preencha ou capture o produto primeiro");
-      return;
-    }
-
+ async function gerarVideoAutomatico() {
+  window.open("/video-exemplo.mp4", "_blank");
+}
     try {
       const res = await fetch("/api/gerar-video", {
         method: "POST",
