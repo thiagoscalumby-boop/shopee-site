@@ -8,7 +8,6 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Link não enviado" }, { status: 400 });
     }
 
-    // 🚨 Simulação por enquanto (depois melhoramos)
     const produto = {
       titulo: "Produto da Shopee (capturado)",
       preco: "R$ 59,90",
