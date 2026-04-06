@@ -25,18 +25,22 @@ export default function Home() {
     }}>
       <h1>🔥 TSC Shopee Vídeos</h1>
 
-      <input
-        type="text"
-        placeholder="Cole seu link da Shopee aqui"
-        value={link}
-        onChange={(e) => setLink(e.target.value)}
-        style={{
-          padding: "10px",
-          width: "300px",
-          marginTop: "20px",
-          borderRadius: "8px"
-        }}
-      />
+     <input
+  type="text"
+  placeholder="Cole o link do produto"
+  value={link}
+  onChange={(e) => setLink(e.target.value)}
+  style={{
+    width: "100%",
+    padding: "12px",
+    borderRadius: "10px",
+    border: "1px solid #ccc",
+    marginBottom: "12px",
+    background: "#fff",
+    color: "#111",
+    caretColor: "#111"
+  }}
+/>
 
       <button
         onClick={gerarVideo}
