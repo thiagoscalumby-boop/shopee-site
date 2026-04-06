@@ -1,294 +1,488 @@
-'use client';
+import React, { useMemo, useState } from "react";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Separator } from "@/components/ui/separator";
+import { motion } from "framer-motion";
+import {
+  RefreshCcw,
+  Wand2,
+  Film,
+  MessageCircle,
+  Copy,
+  Globe,
+  Sparkles,
+  Clock3,
+  PlayCircle,
+  Package,
+  Link as LinkIcon,
+} from "lucide-react";
 
-import React, { useMemo, useState } from 'react';
-import { Film, Link as LinkIcon, Sparkles, Copy, Download, PlayCircle, Wand2, MessageCircle, Package, Clock3 } from 'lucide-react';
-import { motion } from 'framer-motion';
+type ProductData = {
+  platform: string;
+  title: string;
+  price: string;
+  image: string;
+  category: string;
+  shortUrl: string;
+};
 
-const initialHistory = [
+type GeneratedContent = {
+  hook: string;
+  caption: string;
+  hashtags: string;
+  scenes: string[];
+  whatsappText: string;
+  cta: string;
+  filename: string;
+};
+
+type HistoryItem = {
+  id: number;
+  platform: string;
+  title: string;
+  price: string;
+  url: string;
+  status: string;
+};
+
+const starterHistory: HistoryItem[] = [
   {
     id: 1,
-    url: 'https://shopee.com.br/produto-exemplo',
-    title: 'Fone Bluetooth Sem Fio',
-    price: 'R$ 49,90',
-    status: 'Pronto',
-    caption: '🎧 Fone Bluetooth com ótimo custo-benefício. Aproveite a oferta antes que acabe! Link na bio/WhatsApp.',
+    platform: "Shopee",
+    title: "Fone Bluetooth Sem Fio",
+    price: "R$ 49,90",
+    url: "https://shopee.com.br/exemplo-fone",
+    status: "Pronto",
   },
   {
     id: 2,
-    url: 'https://shopee.com.br/produto-exemplo-2',
-    title: 'Mini Liquidificador Portátil',
-    price: 'R$ 59,90',
-    status: 'Processando',
-    caption: '🥤 Faça seus sucos em qualquer lugar. Prático, portátil e em oferta hoje.',
+    platform: "Amazon",
+    title: "Mini Liquidificador Portátil",
+    price: "R$ 79,90",
+    url: "https://amazon.com.br/exemplo-liquidificador",
+    status: "Pronto",
   },
 ];
 
-function extractSlug(url: string) {
+function detectPlatform(url: string) {
+  const value = url.toLowerCase();
+  if (value.includes("shopee")) return "Shopee";
+  if (value.includes("amazon")) return "Amazon";
+  if (value.includes("mercadolivre") || value.includes("mercado livre") || value.includes("meli")) return "Mercado Livre";
+  if (value.includes("aliexpress")) return "AliExpress";
+  return "Genérico";
+}
+
+function tryParseTitleFromUrl(url: string) {
   try {
     const parsed = new URL(url);
-    const slug = parsed.pathname.split('/').filter(Boolean).pop();
-    return slug || 'produto-shopee';
+    const last = parsed.pathname.split("/").filter(Boolean).pop() || "produto-afiliado";
+    return last.replace(/[-_]/g, " ").replace(/\b\w/g, (m) => m.toUpperCase());
   } catch {
-    return 'produto-shopee';
+    return "Produto Afiliado";
   }
 }
 
-function generateCopy(productName: string, price: string) {
-  const safeName = productName || 'Produto Shopee';
-  const safePrice = price || 'Preço especial';
+function createSlug(text: string) {
+  return text
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/(^-|-$)/g, "") || "video-produto";
+}
+
+function mockCaptureProduct(url: string): ProductData {
+  const platform = detectPlatform(url);
+  const title = tryParseTitleFromUrl(url);
 
   return {
-    hook: `🔥 Oferta que vale a pena: ${safeName}`,
-    caption: `Garanta agora ${safeName} por ${safePrice}. Produto ideal para quem busca praticidade e economia. Aproveite antes que o preço mude.`,
-    hashtags: '#Shopee #Achadinhos #Oferta #Promoção #Afiliado #ComprasOnline #Desconto #OfertaDoDia',
-    scenes: [
-      `Cena 1: mostrar nome do produto "${safeName}" com entrada impactante.`,
-      `Cena 2: destacar preço "${safePrice}" com selo de oferta.`,
-      'Cena 3: exibir benefício principal com animação curta.',
-      "Cena 4: CTA final: 'Clique no link e aproveite agora'.",
-    ],
+    platform,
+    title,
+    price: platform === "Shopee" ? "R$ 39,90" : platform === "Amazon" ? "R$ 89,90" : "R$ 59,90",
+    image: "https://placehold.co/600x600/png",
+    category: "Achadinhos e utilidades",
+    shortUrl: url,
   };
 }
 
-function Card({ children, className = '' }: { children: React.ReactNode; className?: string }) {
-  return <div className={`rounded-[24px] bg-white shadow-sm ${className}`}>{children}</div>;
+function generateContent(product: ProductData): GeneratedContent {
+  const hook = `🔥 ${product.title} com preço chamativo`;
+  const cta = "Clique no link e aproveite antes que a oferta mude.";
+  const caption = `Olha esse achadinho: ${product.title} por ${product.price}. Produto ideal para quem quer economizar e comprar bem. ${cta}`;
+  const hashtags = "#Achadinhos #Oferta #Promoção #Afiliado #ComprasOnline #Desconto #Shopee #Amazon #MercadoLivre";
+  const scenes = [
+    `Cena 1: entrada forte com o nome do produto \"${product.title}\".`,
+    `Cena 2: mostrar o preço \"${product.price}\" com destaque visual.`,
+    "Cena 3: destacar benefício principal do produto com texto curto.",
+    "Cena 4: reforçar que é uma boa oportunidade de compra.",
+    "Cena 5: CTA final mandando clicar no link agora.",
+  ];
+  const whatsappText = `${caption}\n\n${product.shortUrl}`;
+  const filename = `${createSlug(product.title)}.mp4`;
+
+  return { hook, caption, hashtags, scenes, whatsappText, cta, filename };
 }
 
-function SectionTitle({ title, subtitle }: { title: string; subtitle?: string }) {
-  return (
-    <div className="mb-4">
-      <h2 className="text-xl font-bold md:text-2xl">{title}</h2>
-      {subtitle ? <p className="mt-1 text-sm text-slate-500">{subtitle}</p> : null}
-    </div>
-  );
-}
-
-function ActionButton({ children, secondary = false, onClick, disabled = false }: { children: React.ReactNode; secondary?: boolean; onClick?: () => void; disabled?: boolean }) {
-  return (
-    <button
-      onClick={onClick}
-      disabled={disabled}
-      className={`rounded-2xl px-4 py-3 text-sm font-medium transition ${secondary ? 'bg-slate-200 text-slate-900 hover:bg-slate-300' : 'bg-slate-900 text-white hover:bg-slate-800'} disabled:cursor-not-allowed disabled:opacity-60`}
-    >
-      {children}
-    </button>
-  );
-}
-
-function Input({ value, onChange, placeholder }: { value: string; onChange: (e: React.ChangeEvent<HTMLInputElement>) => void; placeholder: string }) {
-  return <input className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-none focus:border-slate-400" value={value} onChange={onChange} placeholder={placeholder} />;
-}
-
-export default function Page() {
-  const [affiliateUrl, setAffiliateUrl] = useState('');
-  const [productTitle, setProductTitle] = useState('');
-  const [productPrice, setProductPrice] = useState('');
-  const [productImage, setProductImage] = useState('');
-  const [processing, setProcessing] = useState(false);
-  const [history, setHistory] = useState(initialHistory);
-  const [activeTab, setActiveTab] = useState<'resultado' | 'preview' | 'historico'>('resultado');
-  const [generated, setGenerated] = useState({
-    hook: '',
-    caption: '',
-    hashtags: '',
-    scenes: [] as string[],
-    filename: 'video-produto-001.mp4',
+export default function AffiliateSystemPro() {
+  const [productUrl, setProductUrl] = useState("");
+  const [capturing, setCapturing] = useState(false);
+  const [generating, setGenerating] = useState(false);
+  const [history, setHistory] = useState<HistoryItem[]>(starterHistory);
+  const [product, setProduct] = useState<ProductData>({
+    platform: "Genérico",
+    title: "",
+    price: "",
+    image: "",
+    category: "",
+    shortUrl: "",
+  });
+  const [content, setContent] = useState<GeneratedContent>({
+    hook: "",
+    caption: "",
+    hashtags: "",
+    scenes: [],
+    whatsappText: "",
+    cta: "",
+    filename: "video-produto.mp4",
   });
 
-  const slug = useMemo(() => extractSlug(affiliateUrl), [affiliateUrl]);
+  const canCapture = useMemo(() => productUrl.trim().length > 0, [productUrl]);
 
-  const handleGenerate = () => {
-    setProcessing(true);
-    const baseTitle = productTitle || slug.replace(/[-_]/g, ' ').replace(/\b\w/g, (m) => m.toUpperCase()) || 'Produto Shopee';
-    const copy = generateCopy(baseTitle, productPrice);
-
+  function handleCapture() {
+    if (!canCapture) return;
+    setCapturing(true);
     setTimeout(() => {
-      setGenerated({ ...copy, filename: `${slug}.mp4` });
+      const data = mockCaptureProduct(productUrl.trim());
+      setProduct(data);
+      setCapturing(false);
+    }, 900);
+  }
+
+  function handleGenerate() {
+    if (!product.title || !product.price) return;
+    setGenerating(true);
+    setTimeout(() => {
+      const generated = generateContent(product);
+      setContent(generated);
       setHistory((prev) => [
         {
           id: prev.length + 1,
-          url: affiliateUrl || 'https://shopee.com.br/seu-link',
-          title: baseTitle,
-          price: productPrice || 'A definir',
-          status: 'Pronto',
-          caption: copy.caption,
+          platform: product.platform,
+          title: product.title,
+          price: product.price,
+          url: product.shortUrl || productUrl,
+          status: "Pronto",
         },
         ...prev,
       ]);
-      setActiveTab('resultado');
-      setProcessing(false);
-    }, 1000);
-  };
+      setGenerating(false);
+    }, 900);
+  }
 
-  const copyText = async (text: string) => {
+  async function copyText(text: string) {
     if (!text) return;
     try {
       await navigator.clipboard.writeText(text);
-      alert('Texto copiado.');
+      alert("Copiado com sucesso.");
     } catch {
-      alert('Não foi possível copiar automaticamente.');
+      alert("Não foi possível copiar automaticamente.");
     }
-  };
+  }
+
+  const whatsappLink = content.whatsappText
+    ? `https://wa.me/?text=${encodeURIComponent(content.whatsappText)}`
+    : "#";
 
   return (
-    <div className="min-h-screen p-4 md:p-8">
+    <div className="min-h-screen bg-slate-50 p-4 md:p-8">
       <div className="mx-auto max-w-7xl space-y-6">
-        <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }} className="grid gap-4 md:grid-cols-[1.5fr_1fr]">
-          <Card className="p-6">
-            <div className="flex flex-wrap gap-2">
-              <span className="rounded-full bg-slate-900 px-3 py-1 text-xs text-white">MVP</span>
-              <span className="rounded-full bg-slate-200 px-3 py-1 text-xs text-slate-800">Painel de afiliado</span>
-            </div>
-            <h1 className="mt-4 text-3xl font-bold md:text-4xl">Gerador de vídeo para link da Shopee</h1>
-            <p className="mt-2 text-slate-500">Cole seu link de afiliado, preencha os dados do produto e gere legenda, hashtags e roteiro em poucos segundos.</p>
-
-            <div className="mt-6 grid gap-4">
-              <div>
-                <label className="mb-2 block text-sm font-medium">Link de afiliado</label>
-                <div className="flex gap-2">
-                  <Input placeholder="https://shopee.com.br/..." value={affiliateUrl} onChange={(e) => setAffiliateUrl(e.target.value)} />
-                  <ActionButton secondary>
-                    <span className="inline-flex items-center gap-2"><LinkIcon size={16} /> Validar</span>
-                  </ActionButton>
+        <motion.div
+          initial={{ opacity: 0, y: 18 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.35 }}
+          className="grid gap-4 xl:grid-cols-[1.7fr_1fr]"
+        >
+          <Card className="rounded-3xl border-0 shadow-sm">
+            <CardHeader>
+              <div className="flex flex-wrap items-center gap-2">
+                <Badge className="rounded-full">Nova versão</Badge>
+                <Badge variant="secondary" className="rounded-full">Multi-link</Badge>
+                <Badge variant="outline" className="rounded-full">Shopee + Amazon + outros</Badge>
+              </div>
+              <CardTitle className="mt-2 text-2xl md:text-3xl">Sistema profissional para links de afiliado</CardTitle>
+              <CardDescription>
+                Cole o link do produto, capture os dados automaticamente, gere conteúdo de venda e prepare a base do vídeo e do WhatsApp.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-5">
+              <div className="grid gap-2">
+                <label className="text-sm font-medium">Link do produto</label>
+                <div className="flex flex-col gap-3 md:flex-row">
+                  <Input
+                    placeholder="https://shopee.com.br/... ou outro link de afiliado"
+                    value={productUrl}
+                    onChange={(e) => setProductUrl(e.target.value)}
+                  />
+                  <Button onClick={handleCapture} disabled={!canCapture || capturing} className="rounded-2xl">
+                    <RefreshCcw className="mr-2 h-4 w-4" />
+                    {capturing ? "Capturando..." : "Capturar produto"}
+                  </Button>
                 </div>
               </div>
 
               <div className="grid gap-4 md:grid-cols-2">
-                <div>
-                  <label className="mb-2 block text-sm font-medium">Nome do produto</label>
-                  <Input placeholder="Ex: Fone Bluetooth" value={productTitle} onChange={(e) => setProductTitle(e.target.value)} />
+                <div className="grid gap-2">
+                  <label className="text-sm font-medium">Plataforma</label>
+                  <Input value={product.platform} onChange={(e) => setProduct({ ...product, platform: e.target.value })} />
                 </div>
-                <div>
-                  <label className="mb-2 block text-sm font-medium">Preço</label>
-                  <Input placeholder="Ex: R$ 49,90" value={productPrice} onChange={(e) => setProductPrice(e.target.value)} />
+                <div className="grid gap-2">
+                  <label className="text-sm font-medium">Categoria</label>
+                  <Input value={product.category} onChange={(e) => setProduct({ ...product, category: e.target.value })} />
                 </div>
               </div>
 
-              <div>
-                <label className="mb-2 block text-sm font-medium">Imagem do produto (opcional)</label>
-                <Input placeholder="https://imagem-do-produto.jpg" value={productImage} onChange={(e) => setProductImage(e.target.value)} />
+              <div className="grid gap-4 md:grid-cols-2">
+                <div className="grid gap-2">
+                  <label className="text-sm font-medium">Nome do produto</label>
+                  <Input value={product.title} onChange={(e) => setProduct({ ...product, title: e.target.value })} placeholder="Nome do produto" />
+                </div>
+                <div className="grid gap-2">
+                  <label className="text-sm font-medium">Preço</label>
+                  <Input value={product.price} onChange={(e) => setProduct({ ...product, price: e.target.value })} placeholder="R$ 00,00" />
+                </div>
               </div>
 
-              <div className="flex flex-wrap gap-3 pt-2">
-                <ActionButton onClick={handleGenerate} disabled={processing || !affiliateUrl}><span className="inline-flex items-center gap-2"><Wand2 size={16} /> {processing ? 'Gerando...' : 'Gerar conteúdo'}</span></ActionButton>
-                <ActionButton secondary><span className="inline-flex items-center gap-2"><Film size={16} /> Processar vídeo</span></ActionButton>
-                <ActionButton secondary><span className="inline-flex items-center gap-2"><MessageCircle size={16} /> Preparar para WhatsApp</span></ActionButton>
+              <div className="grid gap-2">
+                <label className="text-sm font-medium">Imagem do produto</label>
+                <Input value={product.image} onChange={(e) => setProduct({ ...product, image: e.target.value })} placeholder="https://imagem-do-produto.jpg" />
               </div>
-            </div>
+
+              <div className="flex flex-wrap gap-3 pt-1">
+                <Button onClick={handleGenerate} disabled={generating || !product.title || !product.price} className="rounded-2xl">
+                  <Wand2 className="mr-2 h-4 w-4" />
+                  {generating ? "Gerando..." : "Gerar conteúdo"}
+                </Button>
+                <Button variant="secondary" className="rounded-2xl">
+                  <Film className="mr-2 h-4 w-4" />
+                  Gerar vídeo
+                </Button>
+                <a href={whatsappLink} target="_blank" rel="noreferrer">
+                  <Button variant="outline" className="rounded-2xl">
+                    <MessageCircle className="mr-2 h-4 w-4" />
+                    Abrir no WhatsApp
+                  </Button>
+                </a>
+              </div>
+            </CardContent>
           </Card>
 
-          <Card className="p-6">
-            <SectionTitle title="Resumo do projeto" subtitle="Visão simples do que esse painel já pode virar." />
-            <div className="space-y-4 text-sm text-slate-600">
+          <Card className="rounded-3xl border-0 shadow-sm">
+            <CardHeader>
+              <CardTitle className="text-xl">Resumo do sistema</CardTitle>
+              <CardDescription>O que esta versão já organiza para você.</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4 text-sm text-slate-600">
               <div className="flex items-start gap-3 rounded-2xl bg-slate-100 p-3">
-                <Package className="mt-0.5" size={16} />
-                <div><p className="font-medium text-slate-900">Entrada</p><p>Link afiliado, nome, preço, imagem e categoria.</p></div>
+                <Globe className="mt-0.5 h-4 w-4" />
+                <div>
+                  <p className="font-medium text-slate-900">Multi-plataforma</p>
+                  <p>Estrutura pensada para Shopee, Amazon, AliExpress, Mercado Livre e links genéricos.</p>
+                </div>
               </div>
               <div className="flex items-start gap-3 rounded-2xl bg-slate-100 p-3">
-                <Sparkles className="mt-0.5" size={16} />
-                <div><p className="font-medium text-slate-900">Saída</p><p>Legenda pronta, hashtags, roteiro curto e nome do arquivo do vídeo.</p></div>
+                <Sparkles className="mt-0.5 h-4 w-4" />
+                <div>
+                  <p className="font-medium text-slate-900">Conteúdo automático</p>
+                  <p>Gera legenda, hashtags, CTA, roteiro e texto pronto para WhatsApp.</p>
+                </div>
               </div>
               <div className="flex items-start gap-3 rounded-2xl bg-slate-100 p-3">
-                <Clock3 className="mt-0.5" size={16} />
-                <div><p className="font-medium text-slate-900">Próxima fase</p><p>Conectar backend, renderizar vídeo com FFmpeg e salvar histórico em banco.</p></div>
+                <Clock3 className="mt-0.5 h-4 w-4" />
+                <div>
+                  <p className="font-medium text-slate-900">Pronto para crescer</p>
+                  <p>Preparado para receber backend real, vídeo MP4 e captura automática robusta depois.</p>
+                </div>
               </div>
-            </div>
+            </CardContent>
           </Card>
         </motion.div>
 
-        <div className="flex flex-wrap gap-2">
-          {['resultado', 'preview', 'historico'].map((tab) => (
-            <button key={tab} onClick={() => setActiveTab(tab as 'resultado' | 'preview' | 'historico')} className={`rounded-2xl px-4 py-2 text-sm font-medium ${activeTab === tab ? 'bg-slate-900 text-white' : 'bg-white text-slate-700 shadow-sm'}`}>
-              {tab === 'resultado' ? 'Resultado' : tab === 'preview' ? 'Preview do vídeo' : 'Histórico'}
-            </button>
-          ))}
-        </div>
+        <Tabs defaultValue="conteudo" className="space-y-4">
+          <TabsList className="grid w-full grid-cols-4 rounded-2xl">
+            <TabsTrigger value="conteudo">Conteúdo</TabsTrigger>
+            <TabsTrigger value="video">Vídeo</TabsTrigger>
+            <TabsTrigger value="whatsapp">WhatsApp</TabsTrigger>
+            <TabsTrigger value="historico">Histórico</TabsTrigger>
+          </TabsList>
 
-        {activeTab === 'resultado' && (
-          <Card className="p-6">
-            <SectionTitle title="Conteúdo gerado" subtitle="Texto pronto para usar na divulgação do produto." />
-            <div className="grid gap-6 lg:grid-cols-2">
-              <div className="space-y-4">
-                <div className="rounded-2xl bg-slate-100 p-4"><p className="mb-2 text-sm font-medium">Gancho</p><p className="text-sm text-slate-700">{generated.hook || 'Nenhum conteúdo gerado ainda.'}</p></div>
-                <div className="rounded-2xl bg-slate-100 p-4">
-                  <div className="mb-2 flex items-center justify-between gap-3"><p className="text-sm font-medium">Legenda</p><button onClick={() => copyText(generated.caption)} className="text-sm text-slate-700"><span className="inline-flex items-center gap-2"><Copy size={16} /> Copiar</span></button></div>
-                  <p className="text-sm text-slate-700">{generated.caption || 'A legenda aparecerá aqui.'}</p>
-                </div>
-                <div className="rounded-2xl bg-slate-100 p-4">
-                  <div className="mb-2 flex items-center justify-between gap-3"><p className="text-sm font-medium">Hashtags</p><button onClick={() => copyText(generated.hashtags)} className="text-sm text-slate-700"><span className="inline-flex items-center gap-2"><Copy size={16} /> Copiar</span></button></div>
-                  <p className="text-sm text-slate-700">{generated.hashtags || 'As hashtags aparecerão aqui.'}</p>
-                </div>
-              </div>
-              <div className="rounded-2xl bg-slate-100 p-4">
-                <p className="mb-3 text-sm font-medium">Roteiro do vídeo</p>
-                <div className="space-y-2 text-sm text-slate-700">
-                  {generated.scenes.length ? generated.scenes.map((scene, index) => <div key={index} className="rounded-xl bg-white p-3">{scene}</div>) : <p>As cenas do vídeo aparecerão aqui após gerar o conteúdo.</p>}
-                </div>
-              </div>
-            </div>
-          </Card>
-        )}
-
-        {activeTab === 'preview' && (
-          <Card className="p-6">
-            <SectionTitle title="Preview do vídeo" subtitle="Exemplo visual de como o vídeo vertical pode ficar." />
-            <div className="grid gap-6 lg:grid-cols-[340px_1fr]">
-              <div className="mx-auto flex aspect-[9/16] w-full max-w-[320px] flex-col overflow-hidden rounded-[2rem] bg-slate-900 shadow-xl">
-                <div className="flex-1 bg-gradient-to-b from-slate-700 to-slate-900 p-4 text-white">
-                  <div className="flex h-full flex-col justify-between">
-                    <div>
-                      <span className="rounded-full bg-white/15 px-3 py-1 text-xs">OFERTA</span>
-                      <h3 className="mt-3 text-xl font-bold leading-tight">{productTitle || 'Seu produto da Shopee aparece aqui'}</h3>
-                      <p className="mt-2 text-sm text-white/80">{productPrice || 'R$ 00,00'}</p>
+          <TabsContent value="conteudo">
+            <Card className="rounded-3xl border-0 shadow-sm">
+              <CardHeader>
+                <CardTitle>Conteúdo gerado</CardTitle>
+                <CardDescription>Texto pronto para usar em divulgação.</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="grid gap-6 lg:grid-cols-2">
+                  <div className="space-y-4">
+                    <div className="rounded-2xl bg-slate-100 p-4">
+                      <p className="mb-2 text-sm font-medium">Gancho</p>
+                      <p className="text-sm text-slate-700">{content.hook || "O gancho do produto vai aparecer aqui."}</p>
                     </div>
-                    <div className="rounded-2xl bg-white/10 p-3"><p className="text-sm">{generated.hook || 'Gancho do vídeo'}</p></div>
-                  </div>
-                </div>
-                <div className="border-t border-white/10 p-3 text-white"><div className="flex items-center justify-between"><div className="text-xs text-white/70">Arquivo</div><div className="text-xs">{generated.filename}</div></div></div>
-              </div>
-              <div className="space-y-4">
-                <div className="rounded-2xl border border-slate-200 p-4">
-                  <p className="mb-2 text-sm font-medium">Ações futuras</p>
-                  <div className="flex flex-wrap gap-3">
-                    <ActionButton><span className="inline-flex items-center gap-2"><PlayCircle size={16} /> Renderizar vídeo</span></ActionButton>
-                    <ActionButton secondary><span className="inline-flex items-center gap-2"><Download size={16} /> Baixar arquivo</span></ActionButton>
-                  </div>
-                </div>
-                <div className="rounded-2xl border border-slate-200 p-4 text-sm text-slate-600">
-                  <p className="font-medium text-slate-900">Como ligar com backend depois</p>
-                  <div className="my-3 h-px bg-slate-200" />
-                  <p>1. Receber o link no backend.</p>
-                  <p>2. Extrair dados do produto por API ou parser autorizado.</p>
-                  <p>3. Montar cenas e texto automaticamente.</p>
-                  <p>4. Enviar para FFmpeg gerar o vídeo 9:16.</p>
-                  <p>5. Salvar o MP4 e liberar download.</p>
-                </div>
-              </div>
-            </div>
-          </Card>
-        )}
-
-        {activeTab === 'historico' && (
-          <Card className="p-6">
-            <SectionTitle title="Histórico" subtitle="Itens processados ou aguardando renderização." />
-            <div className="space-y-3">
-              {history.map((item) => (
-                <div key={item.id} className="rounded-2xl border border-slate-200 p-4">
-                  <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-                    <div>
-                      <p className="font-medium text-slate-900">{item.title}</p>
-                      <p className="text-sm text-slate-500">{item.price}</p>
-                      <p className="mt-1 break-all text-xs text-slate-400">{item.url}</p>
+                    <div className="rounded-2xl bg-slate-100 p-4">
+                      <div className="mb-2 flex items-center justify-between gap-3">
+                        <p className="text-sm font-medium">Legenda</p>
+                        <Button size="sm" variant="ghost" onClick={() => copyText(content.caption)}>
+                          <Copy className="mr-2 h-4 w-4" />Copiar
+                        </Button>
+                      </div>
+                      <p className="text-sm text-slate-700">{content.caption || "A legenda aparecerá aqui."}</p>
                     </div>
-                    <span className={`w-fit rounded-full px-3 py-1 text-xs ${item.status === 'Pronto' ? 'bg-slate-900 text-white' : 'bg-slate-200 text-slate-800'}`}>{item.status}</span>
+                    <div className="rounded-2xl bg-slate-100 p-4">
+                      <div className="mb-2 flex items-center justify-between gap-3">
+                        <p className="text-sm font-medium">Hashtags</p>
+                        <Button size="sm" variant="ghost" onClick={() => copyText(content.hashtags)}>
+                          <Copy className="mr-2 h-4 w-4" />Copiar
+                        </Button>
+                      </div>
+                      <p className="text-sm text-slate-700">{content.hashtags || "As hashtags aparecerão aqui."}</p>
+                    </div>
                   </div>
-                  <div className="my-3 h-px bg-slate-200" />
-                  <p className="text-sm text-slate-600">{item.caption}</p>
+
+                  <div className="rounded-2xl bg-slate-100 p-4">
+                    <p className="mb-3 text-sm font-medium">Roteiro do vídeo</p>
+                    <div className="space-y-2 text-sm text-slate-700">
+                      {content.scenes.length ? (
+                        content.scenes.map((scene, index) => (
+                          <div key={index} className="rounded-xl bg-white p-3">
+                            {scene}
+                          </div>
+                        ))
+                      ) : (
+                        <p>As cenas do vídeo aparecerão aqui após gerar o conteúdo.</p>
+                      )}
+                    </div>
+                  </div>
                 </div>
-              ))}
-            </div>
-          </Card>
-        )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="video">
+            <Card className="rounded-3xl border-0 shadow-sm">
+              <CardHeader>
+                <CardTitle>Base do vídeo</CardTitle>
+                <CardDescription>Preview simples da estrutura do vídeo vertical.</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="grid gap-6 lg:grid-cols-[340px_1fr]">
+                  <div className="mx-auto flex aspect-[9/16] w-full max-w-[320px] flex-col overflow-hidden rounded-[2rem] bg-slate-900 shadow-xl">
+                    <div className="flex-1 bg-gradient-to-b from-slate-700 to-slate-900 p-4 text-white">
+                      <div className="flex h-full flex-col justify-between">
+                        <div>
+                          <Badge className="rounded-full bg-white/15 text-white hover:bg-white/15">OFERTA</Badge>
+                          <h3 className="mt-3 text-xl font-bold leading-tight">
+                            {product.title || "Seu produto aparece aqui"}
+                          </h3>
+                          <p className="mt-2 text-sm text-white/80">{product.price || "R$ 00,00"}</p>
+                        </div>
+                        <div className="rounded-2xl bg-white/10 p-3 backdrop-blur-sm">
+                          <p className="text-sm">{content.hook || "Gancho do vídeo"}</p>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="border-t border-white/10 p-3 text-white">
+                      <div className="flex items-center justify-between text-xs">
+                        <span>Arquivo</span>
+                        <span>{content.filename}</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="space-y-4">
+                    <div className="rounded-2xl border p-4">
+                      <p className="mb-2 text-sm font-medium">Próximo passo técnico</p>
+                      <p className="text-sm text-slate-600">
+                        Aqui ficará a geração real do MP4 quando o backend com FFmpeg for conectado.
+                      </p>
+                      <div className="mt-4 flex flex-wrap gap-3">
+                        <Button className="rounded-2xl">
+                          <PlayCircle className="mr-2 h-4 w-4" />Renderizar vídeo
+                        </Button>
+                        <Button variant="secondary" className="rounded-2xl">
+                          <Package className="mr-2 h-4 w-4" />Preparar download
+                        </Button>
+                      </div>
+                    </div>
+
+                    <div className="rounded-2xl border p-4 text-sm text-slate-600">
+                      <p className="font-medium text-slate-900">O que falta para o vídeo real</p>
+                      <Separator className="my-3" />
+                      <p>1. Backend de processamento</p>
+                      <p>2. Template de vídeo</p>
+                      <p>3. Renderização MP4</p>
+                      <p>4. Armazenamento do arquivo</p>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="whatsapp">
+            <Card className="rounded-3xl border-0 shadow-sm">
+              <CardHeader>
+                <CardTitle>Mensagem para WhatsApp</CardTitle>
+                <CardDescription>Texto pronto para enviar com o link do produto.</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <Textarea value={content.whatsappText} onChange={() => {}} rows={8} className="resize-none" placeholder="O texto gerado para o WhatsApp aparecerá aqui." />
+                <div className="flex flex-wrap gap-3">
+                  <Button onClick={() => copyText(content.whatsappText)} className="rounded-2xl">
+                    <Copy className="mr-2 h-4 w-4" />Copiar mensagem
+                  </Button>
+                  <a href={whatsappLink} target="_blank" rel="noreferrer">
+                    <Button variant="outline" className="rounded-2xl">
+                      <MessageCircle className="mr-2 h-4 w-4" />Abrir WhatsApp
+                    </Button>
+                  </a>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="historico">
+            <Card className="rounded-3xl border-0 shadow-sm">
+              <CardHeader>
+                <CardTitle>Histórico</CardTitle>
+                <CardDescription>Links processados no painel.</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <ScrollArea className="h-[420px] pr-4">
+                  <div className="space-y-3">
+                    {history.map((item) => (
+                      <div key={item.id} className="rounded-2xl border p-4">
+                        <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+                          <div>
+                            <p className="font-medium text-slate-900">{item.title}</p>
+                            <p className="text-sm text-slate-500">{item.platform} • {item.price}</p>
+                            <p className="mt-1 break-all text-xs text-slate-400">{item.url}</p>
+                          </div>
+                          <Badge variant="secondary" className="rounded-full">{item.status}</Badge>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </ScrollArea>
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
       </div>
     </div>
   );
