@@ -4,9 +4,9 @@ export async function POST(req: Request) {
   try {
     const body = await req.json();
 
-    const link = body?.link;
-    const appId = body?.appId;
-    const secret = body?.secret;
+    const link = body?.link?.trim();
+    const appId = body?.appId?.trim();
+    const secret = body?.secret?.trim();
 
     if (!link) {
       return NextResponse.json(
@@ -16,27 +16,23 @@ export async function POST(req: Request) {
     }
 
     if (!appId || !secret) {
-      return NextResponse.json({
-        error: "Configure seu App ID e Secret na página de configurações."
-      });
+      return NextResponse.json(
+        { error: "Configure seu App ID e Secret primeiro." },
+        { status: 400 }
+      );
     }
 
-    // 🔥 SIMULAÇÃO PROFISSIONAL (base para API real)
-
-    const titulo = "Produto Shopee (API futura)";
-    const preco = "R$ 99,90";
-    const imagem =
-      "https://down-br.img.susercontent.com/file/sg-11134201-22100-xxxx";
-
+    // Simulação preparada para futura integração real da Shopee API
     return NextResponse.json({
-      titulo,
-      preco,
-      imagem,
+      titulo: "Produto Shopee (API preparada)",
+      preco: "R$ 99,90",
+      imagem: "https://via.placeholder.com/300",
+      aviso: "API preparada. Quando você tiver credenciais válidas e endpoint oficial, conectamos a busca real.",
       modo: "api-preparada"
     });
   } catch {
     return NextResponse.json(
-      { error: "Erro ao processar" },
+      { error: "Erro ao processar captura do produto." },
       { status: 500 }
     );
   }
