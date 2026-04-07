@@ -29,6 +29,7 @@ export default function Home() {
   const [roteiro, setRoteiro] = useState("");
   const [whatsLink, setWhatsLink] = useState("");
   const [carregado, setCarregado] = useState(false);
+  const [pro, setPro] = useState(false);
 
   useEffect(() => {
     const usuario = localStorage.getItem("usuario");
@@ -38,6 +39,8 @@ export default function Home() {
       return;
     }
 
+    const usuarioPro = localStorage.getItem("usuario_pro");
+    setPro(usuarioPro === "true");
     setCarregado(true);
   }, []);
 
@@ -102,10 +105,6 @@ export default function Home() {
 
       if (data.aviso) {
         alert(data.aviso);
-      }
-
-      if (data.modo === "api-preparada") {
-        alert("Modo API ativado. Em breve dados reais da Shopee.");
       }
     } catch {
       alert("Erro ao conectar com o servidor");
@@ -219,9 +218,23 @@ ${roteiro}`;
             🔥 TSC Achadinhos Vídeos e Imagens
           </h1>
 
-          <p style={{ textAlign: "center", color: "#bbb", marginBottom: "24px" }}>
+          <p style={{ textAlign: "center", color: "#bbb", marginBottom: "12px" }}>
             Painel profissional para conteúdo de afiliado
           </p>
+
+          <div
+            style={{
+              textAlign: "center",
+              marginBottom: "20px",
+              padding: "10px",
+              borderRadius: "10px",
+              background: pro ? "#052e16" : "#3f1d0b",
+              color: pro ? "#86efac" : "#fdba74",
+              fontWeight: "bold"
+            }}
+          >
+            {pro ? "✅ Conta PRO ativa" : "⭐ Conta gratuita — assine para liberar o plano PRO"}
+          </div>
 
           <div
             style={{
@@ -246,20 +259,22 @@ ${roteiro}`;
               Configurar Shopee
             </button>
 
-            <button
-              onClick={() => (window.location.href = "/vip")}
-              style={{
-                padding: "12px",
-                borderRadius: "10px",
-                border: "none",
-                background: "#f59e0b",
-                color: "#111",
-                fontWeight: "bold",
-                cursor: "pointer"
-              }}
-            >
-              Assinar PRO
-            </button>
+            {!pro && (
+              <button
+                onClick={() => (window.location.href = "/vip")}
+                style={{
+                  padding: "12px",
+                  borderRadius: "10px",
+                  border: "none",
+                  background: "#f59e0b",
+                  color: "#111",
+                  fontWeight: "bold",
+                  cursor: "pointer"
+                }}
+              >
+                Assinar PRO
+              </button>
+            )}
 
             <button
               onClick={sair}
@@ -539,4 +554,4 @@ ${roteiro}`;
       </div>
     </div>
   );
-}
+  }
