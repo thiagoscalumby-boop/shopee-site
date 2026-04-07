@@ -32,26 +32,39 @@ export default function Home() {
   const plataforma = useMemo(() => detectarPlataforma(link), [link]);
 
   async function capturarProduto() {
-    if (!link) {
-      alert("Cole o link primeiro");
+  if (!link) {
+    alert("Cole o link primeiro");
+    return;
+  }
+
+  try {
+    const res = await fetch("/api/capturar-produto", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ link })
+    });
+
+    const data = await res.json();
+
+    if (!res.ok || data.error) {
+      alert(data.error || "Erro ao capturar produto");
+      console.log("DEBUG API:", data);
       return;
     }
 
-    try {
-      const res = await fetch("/api/capturar-produto", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ link }),
-      });
+    setTitulo(data.titulo || "");
+    setPreco(data.preco || "");
+    setImagem(data.imagem || "");
 
-      const data = await res.json();
-
-      if (!res.ok || data.error) {
-        alert(data.error || "Erro ao capturar produto");
-        return;
-      }
+    if (!data.encontrou?.titulo && !data.encontrou?.preco && !data.encontrou?.imagem) {
+      alert("Não consegui puxar os dados desse link. Tente outro link ou preencha manualmente.");
+    }
+  } catch (error) {
+    alert("Erro ao conectar com o servidor");
+  }
+}
 
       setTitulo(data.titulo || "");
       setPreco(data.preco || "");
