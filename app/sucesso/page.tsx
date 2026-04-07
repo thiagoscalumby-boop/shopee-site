@@ -17,7 +17,7 @@ export default function Sucesso() {
         }
 
         const usuario = JSON.parse(usuarioSalvo);
-        const email = usuario?.email?.trim().toLowerCase();
+        const email = usuario?.email?.trim()?.toLowerCase();
 
         if (!email) {
           setStatus("Email do usuário não encontrado.");
