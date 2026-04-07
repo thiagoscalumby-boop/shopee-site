@@ -1,174 +1,84 @@
-type PreviewPageProps = {
-  searchParams?: {
-    titulo?: string;
-    preco?: string;
-    imagem?: string;
-    link?: string;
-  };
-};
+'use client'
 
-export default function PreviewVideoPage({ searchParams }: PreviewPageProps) {
-  const titulo = searchParams?.titulo || "Produto em oferta";
-  const preco = searchParams?.preco || "Preço especial";
+import { useEffect, useRef } from "react";
+
+export default function PreviewVideo({ searchParams }: any) {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+
+  const titulo = searchParams?.titulo || "Produto incrível";
+  const preco = searchParams?.preco || "R$ 0,00";
   const imagem = searchParams?.imagem || "";
-  const link = searchParams?.link || "";
 
-  const textoWhatsapp = `🔥 ${titulo}
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
 
-💰 ${preco}
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
 
-Confira agora:
-${link}`;
+    const img = new Image();
+    img.crossOrigin = "anonymous";
+    img.src = imagem;
 
-  const whatsLink = `https://wa.me/?text=${encodeURIComponent(textoWhatsapp)}`;
+    img.onload = () => {
+      ctx.fillStyle = "#000";
+      ctx.fillRect(0, 0, 720, 1280);
+
+      ctx.drawImage(img, 60, 100, 600, 600);
+
+      ctx.fillStyle = "#fff";
+      ctx.font = "bold 40px Arial";
+      ctx.fillText("🔥 OFERTA", 250, 60);
+
+      ctx.font = "bold 30px Arial";
+      ctx.fillText(titulo.substring(0, 30), 60, 780);
+
+      ctx.fillStyle = "#00ff88";
+      ctx.font = "bold 50px Arial";
+      ctx.fillText(preco, 60, 880);
+
+      ctx.fillStyle = "#fff";
+      ctx.font = "bold 28px Arial";
+      ctx.fillText("Clique no link e aproveite", 120, 1100);
+    };
+  }, [imagem, titulo, preco]);
+
+  function baixarImagem() {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const link = document.createElement("a");
+    link.download = "video-frame.png";
+    link.href = canvas.toDataURL();
+    link.click();
+  }
 
   return (
-    <div
-      style={{
-        minHeight: "100vh",
-        background: "#111",
-        color: "#fff",
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        padding: "20px",
-      }}
-    >
-      <div
-        style={{
-          width: "100%",
-          maxWidth: "420px",
-          background: "#1b1b1b",
-          borderRadius: "18px",
-          padding: "20px",
-          boxShadow: "0 0 20px rgba(0,0,0,0.30)",
-        }}
-      >
-        <div
+    <div style={{ textAlign: "center", background: "#000", minHeight: "100vh", paddingTop: "20px" }}>
+      <h1 style={{ color: "#fff" }}>Preview do Vídeo</h1>
+
+      <canvas
+        ref={canvasRef}
+        width={720}
+        height={1280}
+        style={{ borderRadius: "10px", marginTop: "20px" }}
+      />
+
+      <div style={{ marginTop: "20px" }}>
+        <button
+          onClick={baixarImagem}
           style={{
-            aspectRatio: "9 / 16",
-            background: "#222",
-            borderRadius: "16px",
-            overflow: "hidden",
-            display: "flex",
-            flexDirection: "column",
-            justifyContent: "space-between",
+            padding: "12px 20px",
+            background: "#10b981",
+            color: "#fff",
+            border: "none",
+            borderRadius: "10px",
+            fontWeight: "bold",
+            cursor: "pointer"
           }}
         >
-          <div style={{ padding: "14px" }}>
-            <div
-              style={{
-                display: "inline-block",
-                background: "#f59e0b",
-                color: "#111",
-                padding: "6px 10px",
-                borderRadius: "999px",
-                fontWeight: "bold",
-                fontSize: "12px",
-              }}
-            >
-              OFERTA
-            </div>
-          </div>
-
-          <div style={{ padding: "0 14px" }}>
-            {imagem ? (
-              <img
-                src={imagem}
-                alt={titulo}
-                style={{
-                  width: "100%",
-                  maxHeight: "250px",
-                  objectFit: "cover",
-                  borderRadius: "14px",
-                  border: "1px solid #333",
-                }}
-              />
-            ) : (
-              <div
-                style={{
-                  width: "100%",
-                  height: "250px",
-                  borderRadius: "14px",
-                  background: "#333",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  color: "#bbb",
-                }}
-              >
-                Sem imagem
-              </div>
-            )}
-          </div>
-
-          <div style={{ padding: "16px" }}>
-            <h1 style={{ fontSize: "22px", marginBottom: "10px" }}>{titulo}</h1>
-            <p
-              style={{
-                fontSize: "28px",
-                fontWeight: "bold",
-                color: "#22c55e",
-                marginBottom: "12px",
-              }}
-            >
-              {preco}
-            </p>
-            <p style={{ color: "#ddd", fontSize: "14px", marginBottom: "14px" }}>
-              Aproveite essa oferta antes que acabe.
-            </p>
-            <div
-              style={{
-                background: "#f59e0b",
-                color: "#111",
-                textAlign: "center",
-                padding: "12px",
-                borderRadius: "12px",
-                fontWeight: "bold",
-              }}
-            >
-              Clique no link e confira agora
-            </div>
-          </div>
-        </div>
-
-        <div style={{ display: "grid", gap: "10px", marginTop: "16px" }}>
-          <a
-            href="/video-exemplo.mp4"
-            target="_blank"
-            rel="noreferrer"
-            style={{
-              display: "block",
-              textAlign: "center",
-              background: "#3b82f6",
-              color: "#fff",
-              padding: "12px",
-              borderRadius: "12px",
-              textDecoration: "none",
-              fontWeight: "bold",
-            }}
-          >
-            Baixar vídeo base
-          </a>
-
-          <a
-            href={whatsLink}
-            target="_blank"
-            rel="noreferrer"
-            style={{
-              display: "block",
-              textAlign: "center",
-              background: "#25D366",
-              color: "#111",
-              padding: "12px",
-              borderRadius: "12px",
-              textDecoration: "none",
-              fontWeight: "bold",
-            }}
-          >
-            Enviar no WhatsApp
-          </a>
-        </div>
+          Baixar Imagem do Vídeo
+        </button>
       </div>
     </div>
   );
