@@ -32,44 +32,40 @@ export default function Home() {
   const plataforma = useMemo(() => detectarPlataforma(link), [link]);
 
   async function capturarProduto() {
-  if (!link) {
-    alert("Cole o link primeiro");
-    return;
-  }
-
-  try {
-    const res = await fetch("/api/capturar-produto", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({ link })
-    });
-
-    const data = await res.json();
-
-    if (!res.ok || data.error) {
-      alert(data.error || "Erro ao capturar produto");
-      console.log("DEBUG API:", data);
+    if (!link) {
+      alert("Cole o link primeiro");
       return;
     }
 
-    setTitulo(data.titulo || "");
-    setPreco(data.preco || "");
-    setImagem(data.imagem || "");
+    try {
+      const res = await fetch("/api/capturar-produto", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ link })
+      });
 
-    if (!data.encontrou?.titulo && !data.encontrou?.preco && !data.encontrou?.imagem) {
-      alert("Não consegui puxar os dados desse link. Tente outro link ou preencha manualmente.");
-    }
-  } catch (error) {
-    alert("Erro ao conectar com o servidor");
-  }
-}
+      const data = await res.json();
+
+      if (!res.ok || data.error) {
+        alert(data.error || "Erro ao capturar produto");
+        console.log("DEBUG API:", data);
+        return;
+      }
 
       setTitulo(data.titulo || "");
       setPreco(data.preco || "");
       setImagem(data.imagem || "");
-    } catch {
+
+      if (
+        !data.encontrou?.titulo &&
+        !data.encontrou?.preco &&
+        !data.encontrou?.imagem
+      ) {
+        alert("Não consegui puxar os dados desse link. Tente outro link ou preencha manualmente.");
+      }
+    } catch (error) {
       alert("Erro ao conectar com o servidor");
     }
   }
@@ -150,14 +146,14 @@ ${roteiro}`;
         color: "#fff",
         display: "flex",
         justifyContent: "center",
-        padding: "20px",
+        padding: "20px"
       }}
     >
       <div
         style={{
           width: "100%",
           maxWidth: "900px",
-          marginTop: "30px",
+          marginTop: "30px"
         }}
       >
         <div
@@ -165,7 +161,7 @@ ${roteiro}`;
             background: "#1b1b1b",
             borderRadius: "18px",
             padding: "24px",
-            boxShadow: "0 0 20px rgba(0,0,0,0.30)",
+            boxShadow: "0 0 20px rgba(0,0,0,0.30)"
           }}
         >
           <h1 style={{ textAlign: "center", marginBottom: "8px" }}>
@@ -186,7 +182,7 @@ ${roteiro}`;
                 borderRadius: "10px",
                 background: "#fff",
                 color: "#111",
-                border: "1px solid #ccc",
+                border: "1px solid #ccc"
               }}
             />
 
@@ -199,7 +195,7 @@ ${roteiro}`;
                 borderRadius: "10px",
                 background: "#fff",
                 color: "#111",
-                border: "1px solid #ccc",
+                border: "1px solid #ccc"
               }}
             />
 
@@ -212,7 +208,7 @@ ${roteiro}`;
                 borderRadius: "10px",
                 background: "#fff",
                 color: "#111",
-                border: "1px solid #ccc",
+                border: "1px solid #ccc"
               }}
             />
 
@@ -225,7 +221,7 @@ ${roteiro}`;
                 borderRadius: "10px",
                 background: "#fff",
                 color: "#111",
-                border: "1px solid #ccc",
+                border: "1px solid #ccc"
               }}
             />
 
@@ -234,7 +230,7 @@ ${roteiro}`;
                 display: "flex",
                 gap: "12px",
                 flexWrap: "wrap",
-                marginTop: "8px",
+                marginTop: "8px"
               }}
             >
               <button
@@ -248,7 +244,7 @@ ${roteiro}`;
                   background: "#10b981",
                   color: "#fff",
                   fontWeight: "bold",
-                  cursor: "pointer",
+                  cursor: "pointer"
                 }}
               >
                 Capturar Produto
@@ -265,7 +261,7 @@ ${roteiro}`;
                   background: "#f59e0b",
                   color: "#111",
                   fontWeight: "bold",
-                  cursor: "pointer",
+                  cursor: "pointer"
                 }}
               >
                 Gerar Conteúdo
@@ -282,7 +278,7 @@ ${roteiro}`;
                   background: "#3b82f6",
                   color: "#fff",
                   fontWeight: "bold",
-                  cursor: "pointer",
+                  cursor: "pointer"
                 }}
               >
                 Gerar Vídeo Automático
@@ -299,7 +295,7 @@ ${roteiro}`;
                   background: "#fff",
                   color: "#111",
                   fontWeight: "bold",
-                  cursor: "pointer",
+                  cursor: "pointer"
                 }}
               >
                 Copiar Conteúdo
@@ -313,14 +309,14 @@ ${roteiro}`;
             marginTop: "20px",
             display: "grid",
             gap: "20px",
-            gridTemplateColumns: "1fr",
+            gridTemplateColumns: "1fr"
           }}
         >
           <div
             style={{
               background: "#1b1b1b",
               borderRadius: "18px",
-              padding: "20px",
+              padding: "20px"
             }}
           >
             <h2 style={{ marginBottom: "12px" }}>Informações do produto</h2>
@@ -338,7 +334,7 @@ ${roteiro}`;
                     width: "100%",
                     maxWidth: "260px",
                     borderRadius: "12px",
-                    border: "1px solid #333",
+                    border: "1px solid #333"
                   }}
                 />
               </div>
@@ -349,7 +345,7 @@ ${roteiro}`;
             style={{
               background: "#1b1b1b",
               borderRadius: "18px",
-              padding: "20px",
+              padding: "20px"
             }}
           >
             <h2 style={{ marginBottom: "12px" }}>Legenda pronta</h2>
@@ -363,7 +359,7 @@ ${roteiro}`;
                 padding: "12px",
                 border: "none",
                 background: "#fff",
-                color: "#111",
+                color: "#111"
               }}
             />
           </div>
@@ -372,7 +368,7 @@ ${roteiro}`;
             style={{
               background: "#1b1b1b",
               borderRadius: "18px",
-              padding: "20px",
+              padding: "20px"
             }}
           >
             <h2 style={{ marginBottom: "12px" }}>Hashtags</h2>
@@ -386,7 +382,7 @@ ${roteiro}`;
                 padding: "12px",
                 border: "none",
                 background: "#fff",
-                color: "#111",
+                color: "#111"
               }}
             />
           </div>
@@ -395,7 +391,7 @@ ${roteiro}`;
             style={{
               background: "#1b1b1b",
               borderRadius: "18px",
-              padding: "20px",
+              padding: "20px"
             }}
           >
             <h2 style={{ marginBottom: "12px" }}>Roteiro do vídeo</h2>
@@ -409,7 +405,7 @@ ${roteiro}`;
                 padding: "12px",
                 border: "none",
                 background: "#fff",
-                color: "#111",
+                color: "#111"
               }}
             />
           </div>
@@ -428,7 +424,7 @@ ${roteiro}`;
                 borderRadius: "12px",
                 textDecoration: "none",
                 fontWeight: "bold",
-                marginBottom: "30px",
+                marginBottom: "30px"
               }}
             >
               Abrir no WhatsApp
