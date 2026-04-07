@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useMemo, useState } from "react";
-import { supabase } from "@/lib/supabase";
+import { supabase } from "../lib/supabase";
 
 function detectarPlataforma(link: string) {
   const l = link.toLowerCase();
@@ -43,7 +43,7 @@ export default function Home() {
 
       try {
         const usuario = JSON.parse(usuarioSalvo);
-        const email = usuario?.email?.trim().toLowerCase();
+        const email = usuario?.email?.trim()?.toLowerCase();
 
         if (!email) {
           window.location.href = "/login";
@@ -584,4 +584,4 @@ ${roteiro}`;
       </div>
     </div>
   );
-            }
+}
