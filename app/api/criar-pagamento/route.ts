@@ -4,7 +4,7 @@ export async function POST(req: Request) {
   try {
     const { email } = await req.json();
 
-    const accessToken = "COLE_SEU_TOKEN_NOVO_AQUI";
+    const accessToken = "APP_USR-0fe41006-0eab-4340-8cb6-5e244c7a4abf";
 
     const response = await fetch(
       "https://api.mercadopago.com/checkout/preferences",
