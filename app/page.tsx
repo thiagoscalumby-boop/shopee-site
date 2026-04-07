@@ -49,13 +49,44 @@ export default function Home() {
       return;
     }
 
+    const credenciais = localStorage.getItem("shopee_credenciais");
+
+    if (!credenciais) {
+      alert("Configure seu App ID e Secret primeiro.");
+      window.location.href = "/config";
+      return;
+    }
+
+    let appId = "";
+    let secret = "";
+
+    try {
+      const parsed = JSON.parse(credenciais);
+      appId = parsed.appId || "";
+      secret = parsed.secret || "";
+    } catch {
+      alert("Credenciais da Shopee inválidas. Salve novamente em Configurar Shopee.");
+      window.location.href = "/config";
+      return;
+    }
+
+    if (!appId || !secret) {
+      alert("Configure seu App ID e Secret primeiro.");
+      window.location.href = "/config";
+      return;
+    }
+
     try {
       const res = await fetch("/api/capturar-produto", {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
         },
-        body: JSON.stringify({ link })
+        body: JSON.stringify({
+          link,
+          appId,
+          secret
+        })
       });
 
       const data = await res.json();
@@ -71,6 +102,10 @@ export default function Home() {
 
       if (data.aviso) {
         alert(data.aviso);
+      }
+
+      if (data.modo === "api-preparada") {
+        alert("Modo API ativado. Em breve dados reais da Shopee.");
       }
     } catch {
       alert("Erro ao conectar com o servidor");
@@ -489,4 +524,4 @@ ${roteiro}`;
       </div>
     </div>
   );
-              }
+            }
