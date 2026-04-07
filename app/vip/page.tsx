@@ -1,7 +1,7 @@
 'use client'
 
 export default function VIP() {
-  const linkPagamento = "https://SEU-LINK-DE-PAGAMENTO-AQUI";
+  const linkPagamento = "https://mpago.la/1eriRMQ";
 
   function comprarAgora() {
     window.open(linkPagamento, "_blank");
