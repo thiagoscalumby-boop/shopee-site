@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 
 function detectarPlataforma(link: string) {
   const l = link.toLowerCase();
@@ -28,14 +28,6 @@ export default function Home() {
   const [hashtags, setHashtags] = useState("");
   const [roteiro, setRoteiro] = useState("");
   const [whatsLink, setWhatsLink] = useState("");
-
-  useEffect(() => {
-    const user = localStorage.getItem("usuario");
-
-    if (!user) {
-      window.location.href = "/login";
-    }
-  }, []);
 
   const plataforma = useMemo(() => detectarPlataforma(link), [link]);
 
@@ -437,4 +429,4 @@ ${roteiro}`;
       </div>
     </div>
   );
-  }
+}
