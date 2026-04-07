@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 function detectarPlataforma(link: string) {
   const l = link.toLowerCase();
@@ -28,6 +28,18 @@ export default function Home() {
   const [hashtags, setHashtags] = useState("");
   const [roteiro, setRoteiro] = useState("");
   const [whatsLink, setWhatsLink] = useState("");
+  const [carregado, setCarregado] = useState(false);
+
+  useEffect(() => {
+    const usuario = localStorage.getItem("usuario");
+
+    if (!usuario) {
+      window.location.href = "/login";
+      return;
+    }
+
+    setCarregado(true);
+  }, []);
 
   const plataforma = useMemo(() => detectarPlataforma(link), [link]);
 
@@ -133,6 +145,15 @@ ${roteiro}`;
     }
   }
 
+  function sair() {
+    localStorage.removeItem("usuario");
+    window.location.href = "/login";
+  }
+
+  if (!carregado) {
+    return null;
+  }
+
   return (
     <div
       style={{
@@ -166,6 +187,45 @@ ${roteiro}`;
           <p style={{ textAlign: "center", color: "#bbb", marginBottom: "24px" }}>
             Painel profissional para conteúdo de afiliado
           </p>
+
+          <div
+            style={{
+              display: "flex",
+              gap: "12px",
+              flexWrap: "wrap",
+              marginBottom: "16px"
+            }}
+          >
+            <button
+              onClick={() => (window.location.href = "/config")}
+              style={{
+                padding: "12px",
+                borderRadius: "10px",
+                border: "none",
+                background: "#6366f1",
+                color: "#fff",
+                fontWeight: "bold",
+                cursor: "pointer"
+              }}
+            >
+              Configurar Shopee
+            </button>
+
+            <button
+              onClick={sair}
+              style={{
+                padding: "12px",
+                borderRadius: "10px",
+                border: "none",
+                background: "#fff",
+                color: "#111",
+                fontWeight: "bold",
+                cursor: "pointer"
+              }}
+            >
+              Sair
+            </button>
+          </div>
 
           <div style={{ display: "grid", gap: "12px" }}>
             <input
@@ -429,4 +489,4 @@ ${roteiro}`;
       </div>
     </div>
   );
-}
+              }
