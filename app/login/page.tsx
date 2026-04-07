@@ -1,4 +1,4 @@
-'use client'
+'use client';
 
 import { useState } from "react";
 import { supabase } from "../../lib/supabase";
@@ -6,120 +6,96 @@ import { supabase } from "../../lib/supabase";
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
+  const [mensagem, setMensagem] = useState("");
   const [carregando, setCarregando] = useState(false);
 
-  async function entrar() {
-    if (!email || !senha) {
-      alert("Preencha email e senha.");
-      return;
-    }
-
+  async function fazerLogin(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    setMensagem("");
     setCarregando(true);
 
     try {
-      const usuario = { email, senha };
-      localStorage.setItem("usuario", JSON.stringify(usuario));
-
-      const { error } = await supabase
-        .from("usuarios")
-        .upsert(
-          [
-            {
-              email: email.trim().toLowerCase()
-            }
-          ],
-          { onConflict: "email" }
-        );
+      const { error } = await supabase.auth.signInWithPassword({
+        email,
+        password: senha,
+      });
 
       if (error) {
-        alert("Erro ao salvar usuário no banco.");
-        setCarregando(false);
-        return;
+        setMensagem("Erro ao entrar: " + error.message);
+      } else {
+        setMensagem("Login realizado com sucesso.");
       }
-
-      window.location.href = "/";
-    } catch {
-      alert("Erro ao entrar.");
+    } catch (err) {
+      setMensagem("Erro inesperado ao tentar entrar.");
+      console.error(err);
+    } finally {
+      setCarregando(false);
     }
-
-    setCarregando(false);
   }
 
   return (
-    <div
-      style={{
-        minHeight: "100vh",
-        background: "#111",
-        color: "#fff",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        padding: "20px"
-      }}
-    >
+    <main style={{ minHeight: "100vh", display: "grid", placeItems: "center", padding: "24px" }}>
       <div
         style={{
           width: "100%",
-          maxWidth: "420px",
-          background: "#1b1b1b",
-          borderRadius: "18px",
+          maxWidth: "400px",
+          border: "1px solid #ddd",
+          borderRadius: "12px",
           padding: "24px",
-          boxShadow: "0 0 20px rgba(0,0,0,0.30)"
+          boxShadow: "0 4px 20px rgba(0,0,0,0.08)"
         }}
       >
-        <h1 style={{ textAlign: "center", marginBottom: "8px" }}>
-          Login
+        <h1 style={{ fontSize: "24px", marginBottom: "16px", textAlign: "center" }}>
+          Entrar
         </h1>
 
-        <p style={{ textAlign: "center", color: "#bbb", marginBottom: "24px" }}>
-          Entre para usar a ferramenta
-        </p>
-
-        <div style={{ display: "grid", gap: "12px" }}>
+        <form onSubmit={fazerLogin} style={{ display: "grid", gap: "12px" }}>
           <input
-            placeholder="Email"
+            type="email"
+            placeholder="Seu e-mail"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
+            required
             style={{
               padding: "12px",
-              borderRadius: "10px",
-              background: "#fff",
-              color: "#111",
+              borderRadius: "8px",
               border: "1px solid #ccc"
             }}
           />
 
           <input
             type="password"
-            placeholder="Senha"
+            placeholder="Sua senha"
             value={senha}
             onChange={(e) => setSenha(e.target.value)}
+            required
             style={{
               padding: "12px",
-              borderRadius: "10px",
-              background: "#fff",
-              color: "#111",
+              borderRadius: "8px",
               border: "1px solid #ccc"
             }}
           />
 
           <button
-            onClick={entrar}
+            type="submit"
             disabled={carregando}
             style={{
               padding: "12px",
-              borderRadius: "10px",
+              borderRadius: "8px",
               border: "none",
-              background: "#f59e0b",
-              color: "#111",
-              fontWeight: "bold",
               cursor: "pointer"
             }}
           >
             {carregando ? "Entrando..." : "Entrar"}
           </button>
-        </div>
+        </form>
+
+        {mensagem && (
+          <p style={{ marginTop: "16px", textAlign: "center" }}>
+            {mensagem}
+          </p>
+        )}
       </div>
-    </div>
+    </main>
   );
 }
