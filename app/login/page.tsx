@@ -1,20 +1,48 @@
 'use client'
 
 import { useState } from "react";
+import { supabase } from "@/lib/supabase";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
+  const [carregando, setCarregando] = useState(false);
 
-  function entrar() {
+  async function entrar() {
     if (!email || !senha) {
       alert("Preencha email e senha.");
       return;
     }
 
-    const usuario = { email, senha };
-    localStorage.setItem("usuario", JSON.stringify(usuario));
-    window.location.href = "/";
+    setCarregando(true);
+
+    try {
+      const usuario = { email, senha };
+      localStorage.setItem("usuario", JSON.stringify(usuario));
+
+      const { error } = await supabase
+        .from("usuarios")
+        .upsert(
+          [
+            {
+              email: email.trim().toLowerCase()
+            }
+          ],
+          { onConflict: "email" }
+        );
+
+      if (error) {
+        alert("Erro ao salvar usuário no banco.");
+        setCarregando(false);
+        return;
+      }
+
+      window.location.href = "/";
+    } catch {
+      alert("Erro ao entrar.");
+    }
+
+    setCarregando(false);
   }
 
   return (
@@ -77,6 +105,7 @@ export default function LoginPage() {
 
           <button
             onClick={entrar}
+            disabled={carregando}
             style={{
               padding: "12px",
               borderRadius: "10px",
@@ -87,7 +116,7 @@ export default function LoginPage() {
               cursor: "pointer"
             }}
           >
-            Entrar
+            {carregando ? "Entrando..." : "Entrar"}
           </button>
         </div>
       </div>
