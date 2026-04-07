@@ -50,7 +50,6 @@ export default function Home() {
 
       if (!res.ok || data.error) {
         alert(data.error || "Erro ao capturar produto");
-        console.log("DEBUG API:", data);
         return;
       }
 
@@ -58,14 +57,10 @@ export default function Home() {
       setPreco(data.preco || "");
       setImagem(data.imagem || "");
 
-      if (
-        !data.encontrou?.titulo &&
-        !data.encontrou?.preco &&
-        !data.encontrou?.imagem
-      ) {
-        alert("Não consegui puxar os dados desse link. Tente outro link ou preencha manualmente.");
+      if (data.aviso) {
+        alert(data.aviso);
       }
-    } catch (error) {
+    } catch {
       alert("Erro ao conectar com o servidor");
     }
   }
