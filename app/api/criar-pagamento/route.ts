@@ -12,44 +12,49 @@ export async function POST(req: Request) {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${accessToken}`,
+          Authorization: `Bearer ${accessToken}`
         },
         body: JSON.stringify({
           items: [
             {
               title: "TSC Achadinhos PRO",
               quantity: 1,
-              unit_price: 19.9,
-            },
+              unit_price: 19.9
+            }
           ],
           payer: {
-            email: email || "cliente@email.com",
+            email: email || "cliente@email.com"
           },
           back_urls: {
-            success: "https://seu-site.vercel.app/sucesso",
-            failure: "https://seu-site.vercel.app/erro",
-            pending: "https://seu-site.vercel.app/pendente",
+            success: "https://shopee-site-lovat.vercel.app/sucesso",
+            failure: "https://shopee-site-lovat.vercel.app/erro",
+            pending: "https://shopee-site-lovat.vercel.app/pendente"
           },
-          auto_return: "approved",
-        }),
+          auto_return: "approved"
+        })
       }
     );
 
     const data = await response.json();
 
-    if (!data.init_point) {
+    if (!response.ok || !data.init_point) {
       return NextResponse.json(
-        { error: "Erro ao gerar pagamento", detalhe: data },
+        {
+          error: "Erro ao gerar pagamento",
+          detalhe: data
+        },
         { status: 500 }
       );
     }
 
     return NextResponse.json({
-      url: data.init_point,
+      url: data.init_point
     });
   } catch (error) {
     return NextResponse.json(
-      { error: "Erro interno", detalhe: error },
+      {
+        error: "Erro interno ao gerar pagamento"
+      },
       { status: 500 }
     );
   }
