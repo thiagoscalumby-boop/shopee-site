@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useMemo, useState } from "react";
+import { supabase } from "@/lib/supabase";
 
 function detectarPlataforma(link: string) {
   const l = link.toLowerCase();
@@ -32,16 +33,44 @@ export default function Home() {
   const [pro, setPro] = useState(false);
 
   useEffect(() => {
-    const usuario = localStorage.getItem("usuario");
+    async function carregarUsuario() {
+      const usuarioSalvo = localStorage.getItem("usuario");
 
-    if (!usuario) {
-      window.location.href = "/login";
-      return;
+      if (!usuarioSalvo) {
+        window.location.href = "/login";
+        return;
+      }
+
+      try {
+        const usuario = JSON.parse(usuarioSalvo);
+        const email = usuario?.email?.trim().toLowerCase();
+
+        if (!email) {
+          window.location.href = "/login";
+          return;
+        }
+
+        const { data, error } = await supabase
+          .from("usuarios")
+          .select("pro")
+          .eq("email", email)
+          .single();
+
+        if (!error && data) {
+          setPro(!!data.pro);
+          localStorage.setItem("usuario_pro", data.pro ? "true" : "false");
+        } else {
+          const usuarioPro = localStorage.getItem("usuario_pro");
+          setPro(usuarioPro === "true");
+        }
+
+        setCarregado(true);
+      } catch {
+        window.location.href = "/login";
+      }
     }
 
-    const usuarioPro = localStorage.getItem("usuario_pro");
-    setPro(usuarioPro === "true");
-    setCarregado(true);
+    carregarUsuario();
   }, []);
 
   const plataforma = useMemo(() => detectarPlataforma(link), [link]);
@@ -181,6 +210,7 @@ ${roteiro}`;
 
   function sair() {
     localStorage.removeItem("usuario");
+    localStorage.removeItem("usuario_pro");
     window.location.href = "/login";
   }
 
@@ -554,4 +584,4 @@ ${roteiro}`;
       </div>
     </div>
   );
-  }
+            }
