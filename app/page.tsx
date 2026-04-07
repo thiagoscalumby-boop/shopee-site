@@ -247,6 +247,21 @@ ${roteiro}`;
             </button>
 
             <button
+              onClick={() => (window.location.href = "/vip")}
+              style={{
+                padding: "12px",
+                borderRadius: "10px",
+                border: "none",
+                background: "#f59e0b",
+                color: "#111",
+                fontWeight: "bold",
+                cursor: "pointer"
+              }}
+            >
+              Assinar PRO
+            </button>
+
+            <button
               onClick={sair}
               style={{
                 padding: "12px",
@@ -524,4 +539,4 @@ ${roteiro}`;
       </div>
     </div>
   );
-            }
+}
