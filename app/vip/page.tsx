@@ -1,17 +1,53 @@
 'use client'
 
-export default function VIP() {
-  const linkPagamento = "https://mpago.la/1eriRMQ";
+import { useState } from "react";
 
-  function comprarAgora() {
-    window.open(linkPagamento, "_blank");
+export default function VIP() {
+  const [carregando, setCarregando] = useState(false);
+
+  async function pagarAgora() {
+    setCarregando(true);
+
+    try {
+      const usuario = localStorage.getItem("usuario");
+      let email = "cliente@email.com";
+
+      if (usuario) {
+        const parsed = JSON.parse(usuario);
+        email = parsed.email || "cliente@email.com";
+      }
+
+      const res = await fetch("/api/criar-pagamento", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ email })
+      });
+
+      const data = await res.json();
+
+      if (!res.ok || data.error) {
+        alert(data.error || "Erro ao gerar pagamento");
+        setCarregando(false);
+        return;
+      }
+
+      if (data.url) {
+        window.location.href = data.url;
+        return;
+      }
+
+      alert("Não foi possível abrir o pagamento.");
+    } catch {
+      alert("Erro ao conectar com o pagamento.");
+    }
+
+    setCarregando(false);
   }
 
-  function falarWhatsapp() {
-    const texto = encodeURIComponent(
-      "Olá! Quero assinar o TSC Achadinhos PRO."
-    );
-    window.open(`https://wa.me/?text=${texto}`, "_blank");
+  function voltar() {
+    window.location.href = "/";
   }
 
   return (
@@ -34,7 +70,7 @@ export default function VIP() {
         </h1>
 
         <p style={{ textAlign: "center", color: "#bbb", marginBottom: "30px" }}>
-          Gere conteúdo automático e aumente suas vendas como afiliado
+          Tenha acesso completo à ferramenta profissional para afiliados
         </p>
 
         <div
@@ -66,7 +102,7 @@ export default function VIP() {
             <p style={{ margin: 0, color: "#bbb" }}>Assinatura mensal</p>
             <h1 style={{ color: "#10b981", margin: "10px 0" }}>R$ 19,90</h1>
             <p style={{ margin: 0, color: "#bbb" }}>
-              Acesso à ferramenta para criar conteúdo e vendas mais rápido
+              Acesso à ferramenta para criar conteúdo e vender mais rápido
             </p>
           </div>
 
@@ -78,7 +114,8 @@ export default function VIP() {
             }}
           >
             <button
-              onClick={comprarAgora}
+              onClick={pagarAgora}
+              disabled={carregando}
               style={{
                 width: "100%",
                 padding: "15px",
@@ -90,15 +127,15 @@ export default function VIP() {
                 cursor: "pointer"
               }}
             >
-              Quero assinar agora
+              {carregando ? "Gerando pagamento..." : "Pagar agora"}
             </button>
 
             <button
-              onClick={falarWhatsapp}
+              onClick={voltar}
               style={{
                 width: "100%",
                 padding: "15px",
-                background: "#25D366",
+                background: "#fff",
                 color: "#111",
                 border: "none",
                 borderRadius: "10px",
@@ -106,7 +143,7 @@ export default function VIP() {
                 cursor: "pointer"
               }}
             >
-              Falar no WhatsApp
+              Voltar
             </button>
           </div>
         </div>
